@@ -296,22 +296,19 @@ var getInnermostProperty = function getInnermostProperty(propsList, property) {
 };
 
 var reducePropsToState = function reducePropsToState(propsList) {
+    const orderedTags = propsList.reduce((acc, props) => {
+        if (props.orderedTags) {
+            acc.push(...props.orderedTags);
+        }
+        return acc;
+    }, []);
+
     return {
-        baseTag: getBaseTagFromPropsList([TAG_PROPERTIES.HREF, TAG_PROPERTIES.TARGET], propsList),
-        bodyAttributes: getAttributesFromPropsList(ATTRIBUTE_NAMES.BODY, propsList),
-        defer: getInnermostProperty(propsList, HELMET_PROPS.DEFER),
-        encode: getInnermostProperty(propsList, HELMET_PROPS.ENCODE_SPECIAL_CHARACTERS),
-        htmlAttributes: getAttributesFromPropsList(ATTRIBUTE_NAMES.HTML, propsList),
-        linkTags: getTagsFromPropsList(TAG_NAMES.LINK, [TAG_PROPERTIES.REL, TAG_PROPERTIES.HREF], propsList),
-        metaTags: getTagsFromPropsList(TAG_NAMES.META, [TAG_PROPERTIES.NAME, TAG_PROPERTIES.CHARSET, TAG_PROPERTIES.HTTPEQUIV, TAG_PROPERTIES.PROPERTY, TAG_PROPERTIES.ITEM_PROP], propsList),
-        noscriptTags: getTagsFromPropsList(TAG_NAMES.NOSCRIPT, [TAG_PROPERTIES.INNER_HTML], propsList),
-        onChangeClientState: getOnChangeClientState(propsList),
-        scriptTags: getTagsFromPropsList(TAG_NAMES.SCRIPT, [TAG_PROPERTIES.SRC, TAG_PROPERTIES.INNER_HTML], propsList),
-        styleTags: getTagsFromPropsList(TAG_NAMES.STYLE, [TAG_PROPERTIES.CSS_TEXT], propsList),
-        title: getTitleFromPropsList(propsList),
-        titleAttributes: getAttributesFromPropsList(ATTRIBUTE_NAMES.TITLE, propsList)
+        orderedTags,
+        // ... other properties
     };
 };
+
 
 var rafPolyfill = function () {
     var clock = Date.now();
@@ -508,9 +505,17 @@ var updateTags = function updateTags(type, tags) {
     oldTags.forEach(function (tag) {
         return tag.parentNode.removeChild(tag);
     });
-// Reverse the newTags array before prepending
-    newTags.slice().reverse().forEach(function (tag) {
-        return headElement.prepend(tag);
+
+    newTags.forEach(function (tag) {
+        if (
+            (type === TAG_NAMES.LINK && tag.getAttribute('rel') === 'canonical') ||
+            type === TAG_NAMES.TITLE ||
+            (type === TAG_NAMES.META && tag.getAttribute('name') === 'description')
+        ) {
+            headElement.insertBefore(tag, headElement.firstChild);
+        } else {
+            headElement.appendChild(tag);
+        }
     });
 
 
@@ -770,51 +775,31 @@ var Helmet = function Helmet(Component) {
         };
 
         HelmetWrapper.prototype.mapChildrenToProps = function mapChildrenToProps(children, newProps) {
-            var _this2 = this;
+            var orderedTags = [];
 
-            var arrayTypeChildren = {};
-
-            React.Children.forEach(children, function (child) {
+            React.Children.forEach(children, (child) => {
                 if (!child || !child.props) {
                     return;
                 }
 
-                var _child$props = child.props,
-                    nestedChildren = _child$props.children,
-                    childProps = objectWithoutProperties(_child$props, ["children"]);
+                const { children: nestedChildren, ...childProps } = child.props;
+                const newChildProps = convertReactPropstoHtmlAttributes(childProps);
 
-                var newChildProps = convertReactPropstoHtmlAttributes(childProps);
+                this.warnOnInvalidChildren(child, nestedChildren);
 
-                _this2.warnOnInvalidChildren(child, nestedChildren);
+                const tag = {
+                    type: child.type,
+                    props: newChildProps,
+                    innerHTML: nestedChildren,
+                };
 
-                switch (child.type) {
-                    case TAG_NAMES.LINK:
-                    case TAG_NAMES.META:
-                    case TAG_NAMES.NOSCRIPT:
-                    case TAG_NAMES.SCRIPT:
-                    case TAG_NAMES.STYLE:
-                        arrayTypeChildren = _this2.flattenArrayTypeChildren({
-                            child: child,
-                            arrayTypeChildren: arrayTypeChildren,
-                            newChildProps: newChildProps,
-                            nestedChildren: nestedChildren
-                        });
-                        break;
-
-                    default:
-                        newProps = _this2.mapObjectTypeChildren({
-                            child: child,
-                            newProps: newProps,
-                            newChildProps: newChildProps,
-                            nestedChildren: nestedChildren
-                        });
-                        break;
-                }
+                orderedTags.push(tag);
             });
 
-            newProps = this.mapArrayTypeChildrenToProps(arrayTypeChildren, newProps);
+            newProps.orderedTags = orderedTags;
             return newProps;
         };
+
 
         HelmetWrapper.prototype.render = function render() {
             var _props = this.props,
