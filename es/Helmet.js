@@ -377,38 +377,8 @@ var commitTagChanges = function commitTagChanges(newState, cb) {
     updateAttributes(TAG_NAMES.BODY, bodyAttributes);
     updateAttributes(TAG_NAMES.HTML, htmlAttributes);
 
-    var headElement = document.head || document.querySelector(TAG_NAMES.HEAD);
+    updateTitle(title, titleAttributes);
 
-    // --- Begin Modification ---
-
-    // Move canonical link to the top of the head
-    if (linkTags && linkTags.length > 0) {
-        var canonicalLinkIndex = linkTags.findIndex(function (tag) {
-            return tag.rel === 'canonical';
-        });
-        if (canonicalLinkIndex !== -1) {
-            var canonicalLinkTag = linkTags.splice(canonicalLinkIndex, 1)[0];
-            updateSingleTag(TAG_NAMES.LINK, canonicalLinkTag, headElement, true);
-        }
-    }
-
-    // Update the title and insert it at the top
-    updateTitle(title, titleAttributes, true);
-
-    // Move meta description to the top of the head (after title)
-    if (metaTags && metaTags.length > 0) {
-        var metaDescriptionIndex = metaTags.findIndex(function (tag) {
-            return tag.name === 'description';
-        });
-        if (metaDescriptionIndex !== -1) {
-            var metaDescriptionTag = metaTags.splice(metaDescriptionIndex, 1)[0];
-            updateSingleTag(TAG_NAMES.META, metaDescriptionTag, headElement, false, true);
-        }
-    }
-
-    // --- End Modification ---
-
-    // Update remaining tags
     var tagUpdates = {
         baseTag: updateTags(TAG_NAMES.BASE, baseTag),
         linkTags: updateTags(TAG_NAMES.LINK, linkTags),
@@ -426,11 +396,12 @@ var commitTagChanges = function commitTagChanges(newState, cb) {
             newTags = _tagUpdates$tagType.newTags,
             oldTags = _tagUpdates$tagType.oldTags;
 
+
         if (newTags.length) {
             addedTags[tagType] = newTags;
         }
         if (oldTags.length) {
-            removedTags[tagType] = oldTags;
+            removedTags[tagType] = tagUpdates[tagType].oldTags;
         }
     });
 
@@ -438,79 +409,6 @@ var commitTagChanges = function commitTagChanges(newState, cb) {
 
     onChangeClientState(newState, addedTags, removedTags);
 };
-
-var updateTitle = function updateTitle(title, attributes, insertAtStart) {
-    var headElement = document.head || document.querySelector(TAG_NAMES.HEAD);
-
-    var titleElement = document.getElementsByTagName(TAG_NAMES.TITLE)[0];
-    if (!titleElement) {
-        // Create the title element if it doesn't exist
-        titleElement = document.createElement(TAG_NAMES.TITLE);
-        titleElement.setAttribute(HELMET_ATTRIBUTE, "true");
-        if (insertAtStart) {
-            headElement.insertBefore(titleElement, headElement.firstChild);
-        } else {
-            headElement.appendChild(titleElement);
-        }
-    } else if (insertAtStart) {
-        // Move existing title element to the top
-        headElement.removeChild(titleElement);
-        headElement.insertBefore(titleElement, headElement.firstChild);
-    }
-
-    // Set the title
-    if (typeof title !== "undefined" && titleElement.innerHTML !== title) {
-        titleElement.innerHTML = flattenArray(title);
-    }
-
-    // Update attributes
-    updateAttributes(TAG_NAMES.TITLE, attributes);
-};
-
-var updateSingleTag = function updateSingleTag(type, tag, headElement, insertAtStart, afterTitle) {
-    var newElement = document.createElement(type);
-
-    for (var attribute in tag) {
-        if (tag.hasOwnProperty(attribute)) {
-            if (attribute === TAG_PROPERTIES.INNER_HTML) {
-                newElement.innerHTML = tag.innerHTML;
-            } else if (attribute === TAG_PROPERTIES.CSS_TEXT) {
-                if (newElement.styleSheet) {
-                    newElement.styleSheet.cssText = tag.cssText;
-                } else {
-                    newElement.appendChild(document.createTextNode(tag.cssText));
-                }
-            } else {
-                var value = typeof tag[attribute] === "undefined" ? "" : tag[attribute];
-                newElement.setAttribute(attribute, value);
-            }
-        }
-    }
-
-    newElement.setAttribute(HELMET_ATTRIBUTE, "true");
-
-    // Remove any existing tag of the same type with the same attributes
-    var existingTags = headElement.querySelectorAll(type + "[" + HELMET_ATTRIBUTE + "]");
-    existingTags.forEach(function (existingTag) {
-        if (existingTag.isEqualNode(newElement)) {
-            existingTag.parentNode.removeChild(existingTag);
-        }
-    });
-
-    if (insertAtStart) {
-        headElement.insertBefore(newElement, headElement.firstChild);
-    } else if (afterTitle) {
-        var titleElement = headElement.getElementsByTagName(TAG_NAMES.TITLE)[0];
-        if (titleElement && titleElement.nextSibling) {
-            headElement.insertBefore(newElement, titleElement.nextSibling);
-        } else {
-            headElement.appendChild(newElement);
-        }
-    } else {
-        headElement.appendChild(newElement);
-    }
-};
-
 
 var flattenArray = function flattenArray(possibleArray) {
     return Array.isArray(possibleArray) ? possibleArray.join("") : possibleArray;
