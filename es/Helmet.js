@@ -379,38 +379,13 @@ var commitTagChanges = function commitTagChanges(newState, cb) {
     updateAttributes(TAG_NAMES.HTML, htmlAttributes);
 
 
-    const tagUpdates = {
-        baseTag: updateTags(TAG_NAMES.BASE, baseTag),
-        metaTags: updateTags(TAG_NAMES.META, metaTags),
-        linkTags: updateTags(TAG_NAMES.LINK, linkTags),
-        noscriptTags: updateTags(TAG_NAMES.NOSCRIPT, noscriptTags),
-        scriptTags: updateTags(TAG_NAMES.SCRIPT, scriptTags),
-        styleTags: updateTags(TAG_NAMES.STYLE, styleTags)
-    };
+    updateTags(TAG_NAMES.META, metaTags);
+    updateTags(TAG_NAMES.LINK, linkTags);
 
 
     updateTitle(title, titleAttributes);
 
-    var addedTags = {};
-    var removedTags = {};
 
-    Object.keys(tagUpdates).forEach(function (tagType) {
-        var _tagUpdates$tagType = tagUpdates[tagType],
-            newTags = _tagUpdates$tagType.newTags,
-            oldTags = _tagUpdates$tagType.oldTags;
-
-
-        if (newTags.length) {
-            addedTags[tagType] = newTags;
-        }
-        if (oldTags.length) {
-            removedTags[tagType] = tagUpdates[tagType].oldTags;
-        }
-    });
-
-    cb && cb();
-
-    onChangeClientState(newState, addedTags, removedTags);
 };
 
 var flattenArray = function flattenArray(possibleArray) {
