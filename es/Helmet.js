@@ -397,7 +397,7 @@ var updateTitle = function updateTitle(title, attributes) {
     if (typeof title !== "undefined" && document.title !== title) {
         document.title = flattenArray(title);
     }
-
+    document.head.getElementsByTagName("title")[0]?.remove();
     updateAttributes(TAG_NAMES.TITLE, attributes);
 };
 
@@ -405,10 +405,6 @@ var updateAttributes = function updateAttributes(tagName, attributes) {
     var elementTag = document.getElementsByTagName(tagName)[0];
 
     if (!elementTag) {
-        elementTag = document.createElement(tagName);
-        document.head.insertAdjacentElement('afterbegin', elementTag);  // Insert at the top of <head>
-    } else {
-        document.head.removeChild(elementTag)
         elementTag = document.createElement(tagName);
         document.head.insertAdjacentElement('afterbegin', elementTag);  // Insert at the top of <head>
     }
