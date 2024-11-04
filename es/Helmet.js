@@ -70,83 +70,83 @@ var SELF_CLOSING_TAGS = [TAG_NAMES.NOSCRIPT, TAG_NAMES.SCRIPT, TAG_NAMES.STYLE];
 var HELMET_ATTRIBUTE = "data-react-helmet";
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-  return typeof obj;
+    return typeof obj;
 } : function (obj) {
-  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+    return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
 };
 
 var classCallCheck = function (instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
+    if (!(instance instanceof Constructor)) {
+        throw new TypeError("Cannot call a class as a function");
+    }
 };
 
 var createClass = function () {
-  function defineProperties(target, props) {
-    for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];
-      descriptor.enumerable = descriptor.enumerable || false;
-      descriptor.configurable = true;
-      if ("value" in descriptor) descriptor.writable = true;
-      Object.defineProperty(target, descriptor.key, descriptor);
+    function defineProperties(target, props) {
+        for (var i = 0; i < props.length; i++) {
+            var descriptor = props[i];
+            descriptor.enumerable = descriptor.enumerable || false;
+            descriptor.configurable = true;
+            if ("value" in descriptor) descriptor.writable = true;
+            Object.defineProperty(target, descriptor.key, descriptor);
+        }
     }
-  }
 
-  return function (Constructor, protoProps, staticProps) {
-    if (protoProps) defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) defineProperties(Constructor, staticProps);
-    return Constructor;
-  };
+    return function (Constructor, protoProps, staticProps) {
+        if (protoProps) defineProperties(Constructor.prototype, protoProps);
+        if (staticProps) defineProperties(Constructor, staticProps);
+        return Constructor;
+    };
 }();
 
 var _extends = Object.assign || function (target) {
-  for (var i = 1; i < arguments.length; i++) {
-    var source = arguments[i];
+    for (var i = 1; i < arguments.length; i++) {
+        var source = arguments[i];
 
-    for (var key in source) {
-      if (Object.prototype.hasOwnProperty.call(source, key)) {
-        target[key] = source[key];
-      }
+        for (var key in source) {
+            if (Object.prototype.hasOwnProperty.call(source, key)) {
+                target[key] = source[key];
+            }
+        }
     }
-  }
 
-  return target;
+    return target;
 };
 
 var inherits = function (subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-  }
-
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      enumerable: false,
-      writable: true,
-      configurable: true
+    if (typeof superClass !== "function" && superClass !== null) {
+        throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
     }
-  });
-  if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+
+    subClass.prototype = Object.create(superClass && superClass.prototype, {
+        constructor: {
+            value: subClass,
+            enumerable: false,
+            writable: true,
+            configurable: true
+        }
+    });
+    if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
 };
 
 var objectWithoutProperties = function (obj, keys) {
-  var target = {};
+    var target = {};
 
-  for (var i in obj) {
-    if (keys.indexOf(i) >= 0) continue;
-    if (!Object.prototype.hasOwnProperty.call(obj, i)) continue;
-    target[i] = obj[i];
-  }
+    for (var i in obj) {
+        if (keys.indexOf(i) >= 0) continue;
+        if (!Object.prototype.hasOwnProperty.call(obj, i)) continue;
+        target[i] = obj[i];
+    }
 
-  return target;
+    return target;
 };
 
 var possibleConstructorReturn = function (self, call) {
-  if (!self) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
+    if (!self) {
+        throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+    }
 
-  return call && (typeof call === "object" || typeof call === "function") ? call : self;
+    return call && (typeof call === "object" || typeof call === "function") ? call : self;
 };
 
 var encodeSpecialCharacters = function encodeSpecialCharacters(str) {
@@ -296,17 +296,45 @@ var getInnermostProperty = function getInnermostProperty(propsList, property) {
 };
 
 var reducePropsToState = function reducePropsToState(propsList) {
-    const orderedTags = propsList.reduce((acc, props) => {
-        if (props.orderedTags) {
-            acc.push(...props.orderedTags);
-        }
-        return acc;
-    }, []);
-
-    return {
-        orderedTags,
-        // ... other properties
+    var state = {
+        baseTag: getBaseTagFromPropsList([TAG_PROPERTIES.HREF, TAG_PROPERTIES.TARGET], propsList),
+        bodyAttributes: getAttributesFromPropsList(ATTRIBUTE_NAMES.BODY, propsList),
+        defer: getInnermostProperty(propsList, HELMET_PROPS.DEFER),
+        encode: getInnermostProperty(propsList, HELMET_PROPS.ENCODE_SPECIAL_CHARACTERS),
+        htmlAttributes: getAttributesFromPropsList(ATTRIBUTE_NAMES.HTML, propsList),
+        linkTags: getTagsFromPropsList(TAG_NAMES.LINK, [TAG_PROPERTIES.REL, TAG_PROPERTIES.HREF], propsList),
+        metaTags: getTagsFromPropsList(TAG_NAMES.META, [TAG_PROPERTIES.NAME, TAG_PROPERTIES.CHARSET, TAG_PROPERTIES.HTTPEQUIV, TAG_PROPERTIES.PROPERTY, TAG_PROPERTIES.ITEM_PROP], propsList),
+        noscriptTags: getTagsFromPropsList(TAG_NAMES.NOSCRIPT, [TAG_PROPERTIES.INNER_HTML], propsList),
+        onChangeClientState: getOnChangeClientState(propsList),
+        scriptTags: getTagsFromPropsList(TAG_NAMES.SCRIPT, [TAG_PROPERTIES.SRC, TAG_PROPERTIES.INNER_HTML], propsList),
+        styleTags: getTagsFromPropsList(TAG_NAMES.STYLE, [TAG_PROPERTIES.CSS_TEXT], propsList),
+        title: getTitleFromPropsList(propsList),
+        titleAttributes: getAttributesFromPropsList(ATTRIBUTE_NAMES.TITLE, propsList)
     };
+
+    // Reorder linkTags to move the canonical link to the top
+    if (state.linkTags && state.linkTags.length > 1) {
+        var canonicalLinkIndex = state.linkTags.findIndex(function (tag) {
+            return tag.rel === 'canonical';
+        });
+        if (canonicalLinkIndex > -1) {
+            var canonicalLinkTag = state.linkTags.splice(canonicalLinkIndex, 1)[0];
+            state.linkTags.unshift(canonicalLinkTag);
+        }
+    }
+
+    // Reorder metaTags to move the meta description to the top
+    if (state.metaTags && state.metaTags.length > 1) {
+        var metaDescriptionIndex = state.metaTags.findIndex(function (tag) {
+            return tag.name === 'description';
+        });
+        if (metaDescriptionIndex > -1) {
+            var metaDescriptionTag = state.metaTags.splice(metaDescriptionIndex, 1)[0];
+            state.metaTags.unshift(metaDescriptionTag);
+        }
+    }
+
+    return state;
 };
 
 
@@ -505,19 +533,9 @@ var updateTags = function updateTags(type, tags) {
     oldTags.forEach(function (tag) {
         return tag.parentNode.removeChild(tag);
     });
-
     newTags.forEach(function (tag) {
-        if (
-            (type === TAG_NAMES.LINK && tag.getAttribute('rel') === 'canonical') ||
-            type === TAG_NAMES.TITLE ||
-            (type === TAG_NAMES.META && tag.getAttribute('name') === 'description')
-        ) {
-            headElement.insertBefore(tag, headElement.firstChild);
-        } else {
-            headElement.appendChild(tag);
-        }
+        return headElement.appendChild(tag);
     });
-
 
     return {
         oldTags: oldTags,
@@ -775,31 +793,51 @@ var Helmet = function Helmet(Component) {
         };
 
         HelmetWrapper.prototype.mapChildrenToProps = function mapChildrenToProps(children, newProps) {
-            var orderedTags = [];
+            var _this2 = this;
 
-            React.Children.forEach(children, (child) => {
+            var arrayTypeChildren = {};
+
+            React.Children.forEach(children, function (child) {
                 if (!child || !child.props) {
                     return;
                 }
 
-                const { children: nestedChildren, ...childProps } = child.props;
-                const newChildProps = convertReactPropstoHtmlAttributes(childProps);
+                var _child$props = child.props,
+                    nestedChildren = _child$props.children,
+                    childProps = objectWithoutProperties(_child$props, ["children"]);
 
-                this.warnOnInvalidChildren(child, nestedChildren);
+                var newChildProps = convertReactPropstoHtmlAttributes(childProps);
 
-                const tag = {
-                    type: child.type,
-                    props: newChildProps,
-                    innerHTML: nestedChildren,
-                };
+                _this2.warnOnInvalidChildren(child, nestedChildren);
 
-                orderedTags.push(tag);
+                switch (child.type) {
+                    case TAG_NAMES.LINK:
+                    case TAG_NAMES.META:
+                    case TAG_NAMES.NOSCRIPT:
+                    case TAG_NAMES.SCRIPT:
+                    case TAG_NAMES.STYLE:
+                        arrayTypeChildren = _this2.flattenArrayTypeChildren({
+                            child: child,
+                            arrayTypeChildren: arrayTypeChildren,
+                            newChildProps: newChildProps,
+                            nestedChildren: nestedChildren
+                        });
+                        break;
+
+                    default:
+                        newProps = _this2.mapObjectTypeChildren({
+                            child: child,
+                            newProps: newProps,
+                            newChildProps: newChildProps,
+                            nestedChildren: nestedChildren
+                        });
+                        break;
+                }
             });
 
-            newProps.orderedTags = orderedTags;
+            newProps = this.mapArrayTypeChildrenToProps(arrayTypeChildren, newProps);
             return newProps;
         };
-
 
         HelmetWrapper.prototype.render = function render() {
             var _props = this.props,
