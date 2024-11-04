@@ -380,7 +380,7 @@ var commitTagChanges = function commitTagChanges(newState, cb) {
 
     const tagUpdates = {
         baseTag: updateTags(TAG_NAMES.BASE, baseTag),
-        // metaTags: updateTags(TAG_NAMES.META, metaTags),
+        metaTags: updateTags(TAG_NAMES.META, metaTags),
         linkTags: updateTags(TAG_NAMES.LINK, linkTags),
         noscriptTags: updateTags(TAG_NAMES.NOSCRIPT, noscriptTags),
         scriptTags: updateTags(TAG_NAMES.SCRIPT, scriptTags),
