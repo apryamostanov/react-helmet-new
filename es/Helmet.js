@@ -508,9 +508,7 @@ var updateTags = function updateTags(type, tags) {
     oldTags.forEach(function (tag) {
         return tag.parentNode.removeChild(tag);
     });
-    newTags.forEach(function (tag) {
-        headElement.insertBefore(tag, headElement.firstChild);
-    });
+    newTags.forEach(tag => headElement.insertAdjacentElement('afterbegin', tag));
 
 
     return {
