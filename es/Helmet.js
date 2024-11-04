@@ -394,14 +394,13 @@ var flattenArray = function flattenArray(possibleArray) {
 
 var updateTitle = function updateTitle(title, attributes) {
     console.log("updateTitle", title);
-    if (typeof title !== "undefined" && document.title !== title) {
-        document.title = flattenArray(title);
-    }
     document.title = title;
+    document.head.getElementsByTagName("title")[0]?.remove();
     updateAttributes(TAG_NAMES.TITLE, attributes);
 };
 
 var updateAttributes = function updateAttributes(tagName, attributes) {
+    console.log("updateAttributes", tagName, attributes);
     var elementTag = document.getElementsByTagName(tagName)[0];
 
     if (!elementTag) {
