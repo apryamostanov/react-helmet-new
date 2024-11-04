@@ -394,10 +394,27 @@ var flattenArray = function flattenArray(possibleArray) {
 
 var updateTitle = function updateTitle(title, attributes) {
     console.log("updateTitle", title);
+
+    // Set the document title
     document.title = title;
-    document.head.getElementsByTagName("title")[0]?.remove();
-    updateAttributes(TAG_NAMES.TITLE, attributes);
+
+    // Find the <title> tag
+    let titleTag = document.head.querySelector("title");
+
+    // If the <title> tag doesn't exist, create one
+    if (!titleTag) {
+        titleTag = document.createElement("title");
+        titleTag.textContent = title;
+        document.head.insertAdjacentElement("afterbegin", titleTag);
+    } else {
+        // If it exists, update its content
+        titleTag.textContent = title;
+
+        // Move <title> tag to the top of <head>
+        document.head.insertAdjacentElement("afterbegin", titleTag);
+    }
 };
+
 
 var updateAttributes = function updateAttributes(tagName, attributes) {
     console.log("updateAttributes", tagName, attributes);
