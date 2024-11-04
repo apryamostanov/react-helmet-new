@@ -84,17 +84,6 @@
     "sinon": "^2.1.0",
     "sinon-chai": "^2.8.0"
   },
-  "scripts": {
-    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
-    "clean": "rimraf lib coverage es",
-    "lint": "eslint --ignore-path .gitignore --fix -- .",
-    "test": "karma start karma.config.js",
-    "posttest": "istanbul report lcov text",
-    "pretest": "npm run clean && npm run lint",
-    "commit": "git-cz",
-    "build": "rollup -c",
-    "prepublish": "npm run build"
-  },
   "config": {
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
