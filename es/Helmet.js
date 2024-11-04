@@ -377,7 +377,6 @@ var commitTagChanges = function commitTagChanges(newState, cb) {
     updateAttributes(TAG_NAMES.BODY, bodyAttributes);
     updateAttributes(TAG_NAMES.HTML, htmlAttributes);
 
-    updateTitle(title, titleAttributes);
 
     var tagUpdates = {
         baseTag: updateTags(TAG_NAMES.BASE, baseTag),
@@ -387,6 +386,8 @@ var commitTagChanges = function commitTagChanges(newState, cb) {
         scriptTags: updateTags(TAG_NAMES.SCRIPT, scriptTags),
         styleTags: updateTags(TAG_NAMES.STYLE, styleTags)
     };
+
+    updateTitle(title, titleAttributes);
 
     var addedTags = {};
     var removedTags = {};
