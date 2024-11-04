@@ -378,18 +378,14 @@ var commitTagChanges = function commitTagChanges(newState, cb) {
     updateAttributes(TAG_NAMES.HTML, htmlAttributes);
 
 
-    const orderedTagUpdates = [
-        { tagType: TAG_NAMES.BASE, tags: baseTag },
-        { tagType: TAG_NAMES.META, tags: metaTags },
-        { tagType: TAG_NAMES.LINK, tags: linkTags },
-        { tagType: TAG_NAMES.NOSCRIPT, tags: noscriptTags },
-        { tagType: TAG_NAMES.SCRIPT, tags: scriptTags },
-        { tagType: TAG_NAMES.STYLE, tags: styleTags }
-    ];
-
-    const tagUpdates = orderedTagUpdates.map(({ tagType, tags }) => ({
-        [tagType]: updateTags(tagType, tags)
-    }));
+    const tagUpdates = {
+        baseTag: updateTags(TAG_NAMES.BASE, baseTag),
+        // metaTags: updateTags(TAG_NAMES.META, metaTags),
+        linkTags: updateTags(TAG_NAMES.LINK, linkTags),
+        noscriptTags: updateTags(TAG_NAMES.NOSCRIPT, noscriptTags),
+        scriptTags: updateTags(TAG_NAMES.SCRIPT, scriptTags),
+        styleTags: updateTags(TAG_NAMES.STYLE, styleTags)
+    };
 
 
     updateTitle(title, titleAttributes);

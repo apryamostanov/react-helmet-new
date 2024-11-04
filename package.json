@@ -1,7 +1,7 @@
 {
   "name": "react-helmet-new",
   "description": "A document head manager for React",
-  "version": "6.1.12",
+  "version": "6.1.13",
   "main": "./lib/Helmet.js",
   "module": "./es/Helmet.js",
   "author": "NFL <engineers@nfl.com>",
