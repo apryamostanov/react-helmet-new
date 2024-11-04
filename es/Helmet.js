@@ -508,9 +508,11 @@ var updateTags = function updateTags(type, tags) {
     oldTags.forEach(function (tag) {
         return tag.parentNode.removeChild(tag);
     });
-    newTags.forEach(function (tag) {
+// Reverse the newTags array before prepending
+    newTags.slice().reverse().forEach(function (tag) {
         return headElement.prepend(tag);
     });
+
 
     return {
         oldTags: oldTags,
