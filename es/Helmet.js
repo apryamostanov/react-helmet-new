@@ -509,8 +509,9 @@ var updateTags = function updateTags(type, tags) {
         return tag.parentNode.removeChild(tag);
     });
     newTags.forEach(function (tag) {
-        return headElement.appendChild(tag);
+        headElement.insertBefore(tag, headElement.firstChild);
     });
+
 
     return {
         oldTags: oldTags,
