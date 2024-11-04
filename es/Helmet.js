@@ -302,8 +302,8 @@ var reducePropsToState = function reducePropsToState(propsList) {
         defer: getInnermostProperty(propsList, HELMET_PROPS.DEFER),
         encode: getInnermostProperty(propsList, HELMET_PROPS.ENCODE_SPECIAL_CHARACTERS),
         htmlAttributes: getAttributesFromPropsList(ATTRIBUTE_NAMES.HTML, propsList),
-        linkTags: getTagsFromPropsList(TAG_NAMES.LINK, [TAG_PROPERTIES.REL, TAG_PROPERTIES.HREF], propsList),
         metaTags: getTagsFromPropsList(TAG_NAMES.META, [TAG_PROPERTIES.NAME, TAG_PROPERTIES.CHARSET, TAG_PROPERTIES.HTTPEQUIV, TAG_PROPERTIES.PROPERTY, TAG_PROPERTIES.ITEM_PROP], propsList),
+        linkTags: getTagsFromPropsList(TAG_NAMES.LINK, [TAG_PROPERTIES.REL, TAG_PROPERTIES.HREF], propsList),
         noscriptTags: getTagsFromPropsList(TAG_NAMES.NOSCRIPT, [TAG_PROPERTIES.INNER_HTML], propsList),
         onChangeClientState: getOnChangeClientState(propsList),
         scriptTags: getTagsFromPropsList(TAG_NAMES.SCRIPT, [TAG_PROPERTIES.SRC, TAG_PROPERTIES.INNER_HTML], propsList),
@@ -378,14 +378,19 @@ var commitTagChanges = function commitTagChanges(newState, cb) {
     updateAttributes(TAG_NAMES.HTML, htmlAttributes);
 
 
-    var tagUpdates = {
-        baseTag: updateTags(TAG_NAMES.BASE, baseTag),
-        metaTags: updateTags(TAG_NAMES.META, metaTags),
-        linkTags: updateTags(TAG_NAMES.LINK, linkTags),
-        noscriptTags: updateTags(TAG_NAMES.NOSCRIPT, noscriptTags),
-        scriptTags: updateTags(TAG_NAMES.SCRIPT, scriptTags),
-        styleTags: updateTags(TAG_NAMES.STYLE, styleTags)
-    };
+    const orderedTagUpdates = [
+        { tagType: TAG_NAMES.BASE, tags: baseTag },
+        { tagType: TAG_NAMES.META, tags: metaTags },
+        { tagType: TAG_NAMES.LINK, tags: linkTags },
+        { tagType: TAG_NAMES.NOSCRIPT, tags: noscriptTags },
+        { tagType: TAG_NAMES.SCRIPT, tags: scriptTags },
+        { tagType: TAG_NAMES.STYLE, tags: styleTags }
+    ];
+
+    const tagUpdates = orderedTagUpdates.map(({ tagType, tags }) => ({
+        [tagType]: updateTags(tagType, tags)
+    }));
+
 
     updateTitle(title, titleAttributes);
 
