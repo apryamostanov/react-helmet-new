@@ -393,6 +393,7 @@ var flattenArray = function flattenArray(possibleArray) {
 };
 
 var updateTitle = function updateTitle(title, attributes) {
+    console.log("updateTitle", title);
     if (typeof title !== "undefined" && document.title !== title) {
         document.title = flattenArray(title);
     }
@@ -443,6 +444,7 @@ var updateAttributes = function updateAttributes(tagName, attributes) {
 };
 
 var updateTags = function updateTags(type, tags) {
+    console.log("updateTags", type);
     var headElement = document.head || document.querySelector(TAG_NAMES.HEAD);
     var tagNodes = headElement.querySelectorAll(type + "[" + HELMET_ATTRIBUTE + "]");
     var oldTags = Array.prototype.slice.call(tagNodes);
@@ -489,7 +491,7 @@ var updateTags = function updateTags(type, tags) {
     });
     newTags.forEach(tag => headElement.insertAdjacentElement('afterbegin', tag));
 
-
+    console.log("newTags", newTags);
     return {
         oldTags: oldTags,
         newTags: newTags
